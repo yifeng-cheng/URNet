@@ -1,0 +1,28 @@
+# 忽略大文件和缓存
+*.pth
+*.pt
+*.ckpt
+*.tar
+*.zip
+
+# 忽略 Python 缓存
+__pycache__/
+*.pyc
+
+# 忽略日志
+*.log
+
+# 忽略本地环境配置
+.env
+.vscode/
+.idea/
+
+# 忽略不需要上传的目录
+save/
+save_new/
+data/
+test_rgb_data/
+
+# 忽略 Dockerfile
+Dockerfile
+

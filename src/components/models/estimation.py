@@ -12,27 +12,21 @@ class DisparityEstimation(nn.Module):
     def forward(self, cost_volume):
         assert cost_volume.dim() == 4  # [B, D, H, W]
 
-        # Matching similarity or matching cost
         cost_volume = cost_volume if self.match_similarity else -cost_volume
 
-        # Compute probability volume
         prob_volume = F.softmax(cost_volume, dim=1)  # [B, D, H, W]
 
-        # Generate disparity candidates
         D = cost_volume.size(1)
         disp_candidates = torch.arange(0, D, device=cost_volume.device).float()
         disp_candidates = disp_candidates.view(1, D, 1, 1)  # [1, D, 1, 1]
 
-        # Compute mean disparity (expected value)
         mean_disp = torch.sum(prob_volume * disp_candidates, dim=1)  # [B, H, W]
 
-        # Compute variance (uncertainty)
         disp_variance = torch.sum(
             prob_volume * (disp_candidates - mean_disp.unsqueeze(1)) ** 2, dim=1
         )  # [B, H, W]
 
-        # Compute log-variance (instead of std deviation)
-        log_variance = torch.log(disp_variance + 1e-6)  # Add small epsilon to avoid log(0)
+        log_variance = torch.log(disp_variance + 1e-6)  
 
         return mean_disp, log_variance
 
@@ -48,4 +42,4 @@ class DisparityEstimationPyramid(nn.Module):
             mean_disp, log_variance = self.disparity_estimator(cost_volume)
             disparity_pyramid.append((mean_disp, log_variance))
 
-        return disparity_pyramid[::-1]  # Reverse the pyramid order
+        return disparity_pyramid[::-1]  

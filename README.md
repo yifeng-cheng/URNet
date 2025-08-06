@@ -69,3 +69,10 @@ python3 inference.py \
     --checkpoint_path <PATH/TO/CHECKPOINT.PTH> \
     --save_root <PATH/TO/SAVE/RESULTS>
 ```
+
+## Related publications
+- [Stereo Depth from Events Cameras: Concentrate and Focus on the Future([https://openaccess.thecvf.com/content/CVPR2022/papers/Nam_Stereo_Depth_From_Events_Cameras_Concentrate_and_Focus_on_the_CVPR_2022_paper.pdf])
+
+## License
+
+MIT license.

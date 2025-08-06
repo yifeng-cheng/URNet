@@ -7,7 +7,6 @@ from einops import rearrange
 from .concentration import ConcentrationNet
 from .stereo_matching import StereoMatchingNetwork
 
-
 class EventStereoMatchingNetwork(nn.Module):
     def __init__(self,
                  concentration_net=None,

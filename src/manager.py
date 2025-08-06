@@ -13,15 +13,11 @@ class DLManager:
     def __init__(self, args, cfg=None):
         self.args = args
         self.cfg = cfg
-        # 仅 master 进程创建 logger
         self.logger = ExpLogger(save_root=args.save_root) if args.is_master else None
         if self.cfg is not None:
             self._init_from_cfg(cfg)
         self.current_epoch = 0
 
-    # --------------------------------------------------------------------- #
-    # 初始化
-    # --------------------------------------------------------------------- #
     def _init_from_cfg(self, cfg):
         assert cfg is not None
         self.cfg = cfg
@@ -37,10 +33,7 @@ class DLManager:
         self.get_train_loader = getattr(datasets, self.cfg.DATASET.TRAIN.NAME).get_dataloader
         self.get_test_loader  = getattr(datasets, self.cfg.DATASET.TEST .NAME).get_dataloader
         self.method = getattr(methods, self.cfg.METHOD)
-
-    # --------------------------------------------------------------------- #
-    # 训练
-    # --------------------------------------------------------------------- #
+        
     def train(self):
         if self.args.is_master:
             self._log_before_train()
@@ -77,9 +70,6 @@ class DLManager:
             if self.args.is_master:
                 self._log_after_epoch(epoch + 1, time_checker, train_log_dict, 'train')
 
-    # --------------------------------------------------------------------- #
-    # 推理 / 测试
-    # --------------------------------------------------------------------- #
     def test(self):
         test_loader = self.get_test_loader(
             args=self.args,
@@ -97,7 +87,6 @@ class DLManager:
                 data_loader=sequence_dataloader
             )
 
-            # 仅 master 保存可视化
             if self.args.is_master and self.logger:
                 for cur_pred_dict in sequence_pred_list:
                     file_name = cur_pred_dict.pop('file_name')
@@ -109,28 +98,19 @@ class DLManager:
                             image_name=file_name
                         )
 
-    # --------------------------------------------------------------------- #
-    # Checkpoint 相关
-    # --------------------------------------------------------------------- #
     def save(self, name):
         if self.logger:
             self.logger.save_checkpoint(self._make_checkpoint(), name)
 
     def load(self, name):
-        """
-        仅使用 torch.load 加载 checkpoint，避免非 master 进程 logger 为 None 报错
-        """
         assert os.path.isfile(name), f"Checkpoint file not found: {name}"
         checkpoint = torch.load(name, map_location=f'cuda:{self.args.local_rank}')
-        self._init_from_cfg(checkpoint['cfg'])        # 先恢复网络结构
+        self._init_from_cfg(checkpoint['cfg'])        
         self.model.module.load_state_dict(checkpoint['model'], strict=False)
 
         if self.args.is_master:
             print(f"Checkpoint is Loaded from {name}")
 
-    # --------------------------------------------------------------------- #
-    # 内部工具
-    # --------------------------------------------------------------------- #
     def _make_checkpoint(self):
         return {
             'epoch':     self.current_epoch,
@@ -162,10 +142,8 @@ class DLManager:
     def _log_after_epoch(self, epoch, time_checker, log_dict, part):
         if not self.logger:
             return
-        # 时间
         time_checker.update(epoch)
         self.logger.write(f'Epoch: {epoch} | time/epoch: {time_checker.time_per_epoch} | eta: {time_checker.eta}')
-        # 日志
         log = f'{part:5s}'
         for key in log_dict.keys():
             log += f' | {key}: {log_dict[key]}'
@@ -174,16 +152,11 @@ class DLManager:
             else:
                 self.logger.add_scalar(f'{part}/{key}', log_dict[key], epoch)
         self.logger.write(log)
-        # 保存 ckpt
         ckpt = self._make_checkpoint()
         self.logger.save_checkpoint(ckpt, 'final.pth')
         if epoch % self.args.save_term == 0:
             self.logger.save_checkpoint(ckpt, f'{epoch}.pth')
 
-
-# ------------------------------------------------------------------------- #
-# 构建网络 / 优化器 / 调度器
-# ------------------------------------------------------------------------- #
 def _prepare_model(model_cfg, is_distributed=False, local_rank=None):
     model = getattr(models, model_cfg.NAME)(**model_cfg.PARAMS)
     if is_distributed:
@@ -193,12 +166,10 @@ def _prepare_model(model_cfg, is_distributed=False, local_rank=None):
         model = nn.DataParallel(model).cuda()
     return model
 
-
 def _prepare_optimizer(optimizer_cfg, model):
     params_group = model.module.get_params_group(optimizer_cfg.PARAMS.lr)
     optimizer = getattr(optim, optimizer_cfg.NAME)(params_group, **optimizer_cfg.PARAMS)
     return optimizer
-
 
 def _prepare_scheduler(scheduler_cfg, optimizer):
     if scheduler_cfg.NAME == 'CosineAnnealingWarmupRestarts':

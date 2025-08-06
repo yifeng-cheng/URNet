@@ -71,7 +71,7 @@ python3 inference.py \
 ```
 
 ## Related publications
-- [Stereo Depth from Events Cameras: Concentrate and Focus on the Future([https://openaccess.thecvf.com/content/CVPR2022/papers/Nam_Stereo_Depth_From_Events_Cameras_Concentrate_and_Focus_on_the_CVPR_2022_paper.pdf])
+- [Stereo Depth from Events Cameras: Concentrate and Focus on the Future(https://openaccess.thecvf.com/content/CVPR2022/papers/Nam_Stereo_Depth_From_Events_Cameras_Concentrate_and_Focus_on_the_CVPR_2022_paper.pdf)
 
 ## License
 

@@ -27,7 +27,7 @@ DSEC
 │   │           ├── events.h5
 │   │           └── rectify_map.h5
 │   ├── ...
-│   └── zurich_city_11_c                # same structure as train/interlaken_00_c
+│   └── zurich_city_11_c                
 └── test
     ├── interlaken_00_a
     │   ├── calibration
@@ -42,5 +42,28 @@ DSEC
     │   │       └── rectify_map.h5
     │   └── interlaken_00_a.csv
     ├── ...
-    └── zurich_city_15_a                # same structure as test/interlaken_00_a
+    └── zurich_city_15_a                
+```
+
+
+## Getting started
+
+### Build deformable convolution
+```bash
+cd /root/code/src/components/models/deform_conv && bash build.sh
+```
+
+## Training
+```bash
+cd /root/code/scripts
+bash distributed_main.sh
+```
+
+## Inference
+```bash
+cd /root/code
+python3 inference.py \
+    --data_root /root/data \
+    --checkpoint_path <PATH/TO/CHECKPOINT.PTH> \
+    --save_root <PATH/TO/SAVE/RESULTS>
 ```

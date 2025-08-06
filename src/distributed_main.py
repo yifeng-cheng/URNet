@@ -17,7 +17,7 @@ parser.add_argument('--num_workers', type=int, default=4)
 parser.add_argument('--save_term', type=int, default=25)
 
 parser.add_argument('--local_rank', type=int, default=-1)
-parser.add_argument('--seed', type=int, default=42, help='Random seed for reproducibility')  # 新增随机种子参数
+parser.add_argument('--seed', type=int, default=42, help='Random seed for reproducibility')  
 
 args = parser.parse_args()
 

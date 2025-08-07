@@ -3,10 +3,10 @@
 set -x
 
 cuda_idx='0, 3'
-config_path=/media/data/hucao/yifeng/se-cff-test/configs/config.yaml
-data_root=/media/data/hucao/yifeng/se-cff-test/data/DSEC
-save_root=/media/data/hucao/yifeng/se-cff-test/save_new
-#checkpoint_path=/media/data/hucao/yifeng/se-cff-main/checkpoint.pth
+config_path=/root/code/configs/config.yaml
+data_root=/root/data/DSEC
+save_root=/root/code/save
+#checkpoint_path=/root/code/save/checkpoint.pth
 num_workers=4
 NUM_PROC=2
 
